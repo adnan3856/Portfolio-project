@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-PortfolioV2Application<portfolio-v2>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.adnan.portfolio.portfolio_v2.PortfolioV2Application",
+            "projectName": "portfolio-v2",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
