@@ -50,3 +50,14 @@ The API will be available at `http://localhost:8082`.
 ## 📂 Project Structure
 
 The project follows a standard Spring Boot layered architecture, with specific packages for entities, repositories, services, and controllers to ensure high maintainability and testability.
+
+
+## 📝 Changelog / Version History
+
+### [Update 1] - Architecture & Error Handling Refactor
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **Introduced DTO Pattern**: Created `ProfileDto` to act as a secure data carrier between the API and Service layers. This isolates the `Profile` database entity from the controllers, preventing direct database exposure and tight coupling.
+* **Global Exception Handling**: Implemented a `GlobalExceptionHandler` using `@RestControllerAdvice`. Replaced generic `RuntimeException`s with custom exceptions (e.g., `ResourceNotFoundException`) to provide standardized, client-friendly JSON error responses with appropriate HTTP status codes (like `404 Not Found`).
+* **Data Type Alignment**: Fixed a type mismatch bug by ensuring `UUID` is consistently used for entity IDs across the `Profile` entity, `ProfileRepository` (`JpaRepository<Profile, UUID>`), and the Service layer.
+* **JPA Entity Optimization**: Removed Lombok's `@Data` annotation from the `Profile` entity and replaced it with `@Getter` and `@Setter`. This is a JPA best practice to prevent potential performance issues or infinite loops caused by automatically generated `equals()`, `hashCode()`, and `toString()` methods on database entities.

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.adnan.portfolio.portfolio_v2.entity.Profile;
+import com.adnan.portfolio.portfolio_v2.dto.ProfileDto;
 import com.adnan.portfolio.portfolio_v2.service.ProfileService;
 
 @RestController
@@ -22,20 +22,20 @@ public class ProfileController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Profile> saveProfile(@RequestBody Profile profile) {
-        Profile savedProfile = profileService.saveProfile(profile);
+    public ResponseEntity<ProfileDto> saveProfile(@RequestBody ProfileDto profile) {
+        ProfileDto savedProfile = profileService.saveProfile(profile);
         return ResponseEntity.ok(savedProfile);
     }
     
     @GetMapping("/{username}")
-    public ResponseEntity<Profile> getProfileByUsername(@PathVariable String username) {
-        Profile profile = profileService.getProfileByUsername(username);
+    public ResponseEntity<ProfileDto> getProfileByUsername(@PathVariable String username) {
+        ProfileDto profile = profileService.getProfileByUsername(username);
         return ResponseEntity.ok(profile);
     }
 
     @PostMapping("/update/{username}")
-    public ResponseEntity<Profile> updateProfile(@PathVariable String username, @RequestBody Profile profile) {
-        Profile updatedProfile = profileService.updateProfile(username, profile);
+    public ResponseEntity<ProfileDto> updateProfile(@PathVariable String username, @RequestBody ProfileDto profile) {
+        ProfileDto updatedProfile = profileService.updateProfile(username, profile);
         return ResponseEntity.ok(updatedProfile);
     }
 
