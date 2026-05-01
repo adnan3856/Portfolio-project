@@ -1,18 +1,21 @@
 package com.adnan.portfolio.portfolio_v2.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -21,50 +24,37 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "profiles")
-public class Profile {
+@Table(name = "about")
+public class About {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-    
     @Column(nullable = false, length = 100)
-    private String fullName;
-    
-    @Column(nullable = false, length = 500)
-    private String bio;
-    
-    @Column(length = 500)
-    private String resumeUrl;
-    
-    @Column(length = 200)
-    private String githubUrl;
-    
-    @Column(length = 200)
-    private String linkedinUrl;
-    
-    @Column(length = 200)
-    private String portfolioUrl;
-    
-    @Column(nullable = false, unique = true)
-    private String email;
-    
-    @Column(length = 20)
-    private String phone;
-    
-    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, length = 150)
+    private String title;
+
+    private String workEmail;
+    private String workPhone;
+    private String profileImage;
+
+    @ElementCollection
+    @CollectionTable(name = "about_descriptions", joinColumns = @JoinColumn(name = "about_id"))
+    @Column(name = "description", length = 1000)
+    private List<String> description;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", referencedColumnName = "id", nullable = false)
+    private Profile profile;
+
+    @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
-    
+
     @Column
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private About about;
-   
-    
 }

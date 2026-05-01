@@ -61,3 +61,14 @@ The project follows a standard Spring Boot layered architecture, with specific p
 * **Global Exception Handling**: Implemented a `GlobalExceptionHandler` using `@RestControllerAdvice`. Replaced generic `RuntimeException`s with custom exceptions (e.g., `ResourceNotFoundException`) to provide standardized, client-friendly JSON error responses with appropriate HTTP status codes (like `404 Not Found`).
 * **Data Type Alignment**: Fixed a type mismatch bug by ensuring `UUID` is consistently used for entity IDs across the `Profile` entity, `ProfileRepository` (`JpaRepository<Profile, UUID>`), and the Service layer.
 * **JPA Entity Optimization**: Removed Lombok's `@Data` annotation from the `Profile` entity and replaced it with `@Getter` and `@Setter`. This is a JPA best practice to prevent potential performance issues or infinite loops caused by automatically generated `equals()`, `hashCode()`, and `toString()` methods on database entities.
+
+### [Update 2] - About Module & Conflict Handling
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **About Module Integration**: Added a complete layered module (`About` entity, DTO, Repository, Service, and Controller). Established a One-to-One JPA relationship (`@OneToOne`) linking each `About` section securely to its parent `Profile`.
+* **New API Endpoints**: 
+  * `GET /api/about/{username}` - Fetch the About section.
+  * `POST /api/about/save/{username}` - Create a new About section.
+  * `POST /api/about/update/{username}` - Update an existing About section.
+* **Conflict Exception Handling**: Introduced `ResourceAlreadyExistsException` mapped to HTTP `409 Conflict` within the `GlobalExceptionHandler` to elegantly prevent duplicate records when attempting to save an About section for a user that already has one.
+* **Refined Data Models**: Implemented specialized fields (`workEmail` and `workPhone`) and a list-based `description` utilizing `@ElementCollection` to handle multiple paragraphs dynamically.
