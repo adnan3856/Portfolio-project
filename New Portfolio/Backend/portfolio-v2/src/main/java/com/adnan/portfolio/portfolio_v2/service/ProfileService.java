@@ -1,11 +1,13 @@
 package com.adnan.portfolio.portfolio_v2.service;
 
-import com.adnan.portfolio.portfolio_v2.entity.Profile;
+import com.adnan.portfolio.portfolio_v2.dto.ProfileDto;
+
+import java.util.UUID;
 
 public interface ProfileService {
-    Profile saveProfile(Profile profile);
-    Profile getProfileByUsername(String username);
-    Profile updateProfile(String username, Profile profile);
-    void deleteProfile(Long id);
-    Profile getProfileByEmail(String email);
+    ProfileDto saveProfile(ProfileDto profileDto);
+    ProfileDto getProfileByUsername(String username);
+    ProfileDto updateProfile(String username, ProfileDto profileDto);
+    void deleteProfile(UUID id);
+    ProfileDto getProfileByEmail(String email);
 }
