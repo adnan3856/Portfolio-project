@@ -73,4 +73,7 @@ public class Profile {
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Experience> experiences;
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Achievement> achievements;
 }

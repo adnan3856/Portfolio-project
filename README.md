@@ -90,3 +90,9 @@ The project follows a standard Spring Boot layered architecture, with specific p
 * **Experience Integration**: Built the `Experience` entity interconnected to the `Profile` utilizing `@OneToMany`. Handled lists correctly by using `@ElementCollection` for `technologies` and `description`.
 * **Standardized Job Attributes**: Expanded upon requested fields by introducing `companyName`, `companyUrl`, and `location` parameters to better reflect professional resumes.
 * **Chronological Sorting**: Implemented `OrderByStartDateDesc` directly in Spring Data JPA queries so the frontend seamlessly receives the most recent job positions first.
+
+### [Update 6] - Achievements Module
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **Achievements Integration**: Added the `Achievement` entity to handle awards, certifications, and notable recognitions. Established a `@OneToMany` relationship with `Profile`.
+* **Enhanced Professional Fields**: Included custom `issuer` and `date` columns to add context and chronological sorting via `OrderByDateDesc`. Maintained uniform security checks, mapping structures, and endpoint (`GET /api/achievements/{username}`) layouts.
