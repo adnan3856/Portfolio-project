@@ -96,3 +96,10 @@ The project follows a standard Spring Boot layered architecture, with specific p
 
 * **Achievements Integration**: Added the `Achievement` entity to handle awards, certifications, and notable recognitions. Established a `@OneToMany` relationship with `Profile`.
 * **Enhanced Professional Fields**: Included custom `issuer` and `date` columns to add context and chronological sorting via `OrderByDateDesc`. Maintained uniform security checks, mapping structures, and endpoint (`GET /api/achievements/{username}`) layouts.
+
+### [Update 7] - Contact & Inbox Module
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **Dynamic Social Mapping**: Created the `Contact` entity featuring specialized fields for social links, utilizing an `@ElementCollection` map to handle unlimited custom "other portfolio links".
+* **Inbox Messaging System**: Developed a `Message` entity allowing visitors to send messages. Implemented an "Inbox" style API allowing the profile owner to fetch (`GET /api/contact/{username}/messages`), read, and delete incoming messages.
+* **Message Validation**: Enforced strict data integrity on the `POST /api/contact/{username}/message` endpoint by requiring `@NotBlank` properties and valid `@Email` formatting to prevent empty or malformed submissions.
