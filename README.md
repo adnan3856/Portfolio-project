@@ -83,3 +83,10 @@ The project follows a standard Spring Boot layered architecture, with specific p
 * **JPA Relationship Fixes**: Restored the bidirectional `@OneToMany` relationship in the `Profile` entity, ensuring proper Hibernate cascading operations.
 * **Enhanced Security Checks**: Modified ownership verification in the service layer to use case-insensitive username matching (`equalsIgnoreCase`), preventing false-positive `403 Forbidden` errors.
 * **CORS Configuration**: Enabled cross-origin requests on the `SkillController` via `@CrossOrigin` to allow seamless integration with the frontend application.
+
+### [Update 5] - Professional Experience Module
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **Experience Integration**: Built the `Experience` entity interconnected to the `Profile` utilizing `@OneToMany`. Handled lists correctly by using `@ElementCollection` for `technologies` and `description`.
+* **Standardized Job Attributes**: Expanded upon requested fields by introducing `companyName`, `companyUrl`, and `location` parameters to better reflect professional resumes.
+* **Chronological Sorting**: Implemented `OrderByStartDateDesc` directly in Spring Data JPA queries so the frontend seamlessly receives the most recent job positions first.
