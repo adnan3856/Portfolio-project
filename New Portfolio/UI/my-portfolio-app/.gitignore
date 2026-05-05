@@ -1,6 +1,3 @@
-# Ignore the archived legacy project
-Old Portfolio/
-
 # Logs
 logs
 *.log
@@ -34,7 +31,3 @@ dist-ssr/
 *.sln
 *.sw?
 Thumbs.db
-
-# Ignore Java build artifacts 
-target/
-*.class
