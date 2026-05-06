@@ -110,3 +110,12 @@ The project follows a standard Spring Boot layered architecture, with specific p
 * **Vite & React Initialization**: Scaffolded a lightning-fast frontend application using Vite, React, and TypeScript.
 * **Tailwind CSS v4 Integration**: Configured the latest Tailwind CSS v4 using the new `@tailwindcss/vite` plugin and a zero-config CSS variables approach.
 * **Shadcn UI & Theming**: Integrated `shadcn/ui` for accessible, customizable UI primitives. Implemented a robust `ThemeProvider` and a `ModeToggle` component for seamless Light/Dark mode switching.
+
+### [Update 9] - Admin Dashboard & Full API Integration
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **Admin Dashboard Layout**: Developed a responsive admin dashboard interface featuring a sidebar navigation system to manage all portfolio sections (Profile, About, Skills, Experience, Achievements, and Contact) seamlessly.
+* **Dynamic React Forms**: Implemented fully functional form components for each module. These forms utilize custom React hooks to load existing data, allow inline editing (with support for lists and dynamic collections), and save directly to the PostgreSQL database.
+* **Vite Proxy & CORS Configuration**: Configured a local development proxy within `vite.config.ts` to cleanly route `/api` requests to the Spring Boot backend (`127.0.0.1:8082`). This bypassed strict browser CORS policies and fixed local connection drops.
+* **Robust Service Layer**: Expanded the Axios `apiClient` and `portfolioService` to handle full CRUD operations. Introduced targeted error catching to easily distinguish between frontend network failures and backend validations.
+* **Data Serialization Enhancements**: Handled data mismatch edge cases between React and Spring Boot, such as intercepting empty date strings (`""`) in forms and converting them to `null` to prevent `LocalDate` parsing crashes in Java.
