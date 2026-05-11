@@ -31,13 +31,13 @@ export const portfolioService = {
   },
   
   getExperience: async (username: string) => {
-    return apiClient.get(`/experiences/${username}`).then((res) => res.data);
+    return apiClient.get(`/experience/${username}`).then((res) => res.data);
   },
   saveExperience: async (username: string, data: any) => {
-    return apiClient.post(`/experiences/save/${username}`, data).then((res) => res.data);
+    return apiClient.post(`/experience/save/${username}`, data).then((res) => res.data);
   },
   deleteExperience: async (id: string) => {
-    return apiClient.delete(`/experiences/${id}`).then((res) => res.data);
+    return apiClient.delete(`/experience/${id}`).then((res) => res.data);
   },
   
   getAchievements: async (username: string) => {

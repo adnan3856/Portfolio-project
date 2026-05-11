@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useAdmin } from "@/components/admin/AdminContext";
 
 interface SidebarProps {
   activeTab: string;
@@ -6,6 +7,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+  const { username } = useAdmin();
   const tabs = ["Profile", "About", "Skills", "Experience", "Achievements", "Contact"];
   
   return (
@@ -16,6 +18,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
             key={tab}
             variant={activeTab === tab ? "default" : "ghost"}
             className="w-full justify-start font-medium"
+            disabled={tab !== "Profile" && !username}
             onClick={() => setActiveTab(tab)}
           >
             {tab}
