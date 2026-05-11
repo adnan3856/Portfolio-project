@@ -3,6 +3,7 @@ import { Navbar } from "@/Navbar";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { ProfileForm } from "@/components/admin/ProfileForm";
 import { AboutForm, SkillsForm, ExperienceForm, AchievementsForm, ContactForm } from "@/components/admin/FormTemplates";
+import { AdminProvider } from "@/components/admin/AdminContext";
 
 export function Admin() {
   const [activeTab, setActiveTab] = useState("Profile");
@@ -20,6 +21,7 @@ export function Admin() {
   };
 
   return (
+    <AdminProvider>
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased">
       <Navbar />
       
@@ -34,5 +36,6 @@ export function Admin() {
         </main>
       </div>
     </div>
+    </AdminProvider>
   );
 }

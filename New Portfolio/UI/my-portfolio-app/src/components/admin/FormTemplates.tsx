@@ -2,32 +2,23 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { portfolioService } from "@/services/portfolioService";
 import { useApi } from "@/hooks/useApi";
-
-// ---------------------------------------------------------
-// Reusable UI Component for Username Loading
-// ---------------------------------------------------------
-function LoadBar({ isLoading, onLoad }: { isLoading: boolean, onLoad: (username: string) => void }) {
-  const [username, setUsername] = useState("");
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); if (username.trim()) onLoad(username.trim()); }} className="flex gap-4 mb-8 pb-8 border-b">
-      <input
-        type="text" placeholder="Enter username to load..." value={username} onChange={(e) => setUsername(e.target.value)}
-        className="flex h-10 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-      <Button type="submit" variant="secondary" disabled={isLoading}>Load</Button>
-    </form>
-  );
-}
+import { useAdmin } from "@/components/admin/AdminContext";
 
 // ---------------------------------------------------------
 // ABOUT FORM
 // ---------------------------------------------------------
 export function AboutForm() {
+  const { username } = useAdmin();
   const { data, isLoading, error, execute } = useApi(portfolioService.getAbout);
-  const [currentUsername, setCurrentUsername] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   const [formData, setFormData] = useState({ name: "", title: "", workEmail: "", workPhone: "", profileImage: "", description: "" });
+
+  useEffect(() => {
+    if (username) execute(username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
 
   useEffect(() => {
     if (data) {
@@ -41,19 +32,32 @@ export function AboutForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username) return;
+    setSaveMessage(null);
     setIsSaving(true);
     try {
       const payload = { ...formData, description: formData.description.split("\n").filter((l: string) => l.trim() !== "") };
-      await portfolioService.saveAbout(currentUsername, payload);
-      alert("About saved successfully!");
-    } catch (err: any) { alert(err.message); } finally { setIsSaving(false); }
+      await portfolioService.saveAbout(username, payload);
+      setSaveMessage({ type: 'success', text: "About section saved successfully!" });
+      setTimeout(() => setSaveMessage(null), 3000); // Clear toast after 3s
+    } catch (err: any) { 
+      setSaveMessage({ type: 'error', text: err.message });
+    } finally { setIsSaving(false); }
   };
 
   return (
     <div className="border rounded-lg p-6 bg-card shadow-sm space-y-6">
-      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Edit About</h2>{isLoading && <span className="animate-pulse">Loading...</span>}</div>
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <h2 className="text-2xl font-bold tracking-tight">Edit About</h2>
+        {isLoading && <span className="text-sm text-muted-foreground animate-pulse">Loading data...</span>}
+      </div>
+      
       {error && <div className="text-destructive text-sm font-bold">{error}</div>}
-      <LoadBar isLoading={isLoading} onLoad={(u) => { setCurrentUsername(u); execute(u); }} />
+      {saveMessage && (
+        <div className={`p-4 mb-6 rounded-md text-sm font-medium transition-all ${saveMessage.type === 'success' ? 'bg-green-100 text-green-900 dark:bg-green-900/30 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
+          {saveMessage.text}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
@@ -69,7 +73,7 @@ export function AboutForm() {
             className="flex min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
           />
         </div>
-        <Button type="submit" disabled={!currentUsername || isSaving}>{isSaving ? "Saving..." : "Save About"}</Button>
+        <Button type="submit" disabled={!username || isSaving}>{isSaving ? "Saving..." : "Save About"}</Button>
       </form>
     </div>
   );
@@ -79,32 +83,51 @@ export function AboutForm() {
 // SKILLS FORM
 // ---------------------------------------------------------
 export function SkillsForm() {
+  const { username } = useAdmin();
   const { data: skills, isLoading, error, execute } = useApi(portfolioService.getSkills);
-  const [currentUsername, setCurrentUsername] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [formData, setFormData] = useState({ name: "", category: "", percentage: 0, proficiency: "", iconUrl: "", priority: 10 });
+
+  useEffect(() => {
+    if (username) execute(username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username) return;
+    setSaveMessage(null);
     setIsSaving(true);
     try {
-      await portfolioService.saveSkill(currentUsername, formData);
-      execute(currentUsername); // Refresh list
+      await portfolioService.saveSkill(username, formData);
+      execute(username); // Refresh list
       setFormData({ name: "", category: "", percentage: 0, proficiency: "", iconUrl: "", priority: 10 }); // Reset form
-    } catch (err: any) { alert(err.message); } finally { setIsSaving(false); }
+      setSaveMessage({ type: 'success', text: "Skill added successfully!" });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (err: any) { 
+      setSaveMessage({ type: 'error', text: err.message });
+    } finally { setIsSaving(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure?")) return;
-    try { await portfolioService.deleteSkill(id); execute(currentUsername); } 
-    catch (err: any) { alert(err.message); }
+    try { await portfolioService.deleteSkill(id); execute(username); } 
+    catch (err: any) { setSaveMessage({ type: 'error', text: err.message }); }
   };
 
   return (
     <div className="border rounded-lg p-6 bg-card shadow-sm space-y-6">
-      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Manage Skills</h2>{isLoading && <span className="animate-pulse">Loading...</span>}</div>
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <h2 className="text-2xl font-bold tracking-tight">Manage Skills</h2>
+        {isLoading && <span className="text-sm text-muted-foreground animate-pulse">Loading data...</span>}
+      </div>
       {error && <div className="text-destructive text-sm font-bold">{error}</div>}
-      <LoadBar isLoading={isLoading} onLoad={(u) => { setCurrentUsername(u); execute(u); }} />
+      {saveMessage && (
+        <div className={`p-4 mb-6 rounded-md text-sm font-medium transition-all ${saveMessage.type === 'success' ? 'bg-green-100 text-green-900 dark:bg-green-900/30 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
+          {saveMessage.text}
+        </div>
+      )}
 
       {/* Existing Skills List */}
       {skills && Array.isArray(skills) && skills.length > 0 && (
@@ -129,7 +152,7 @@ export function SkillsForm() {
           <div className="space-y-2"><label className="text-sm font-medium">Icon URL</label><input type="url" className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm" value={formData.iconUrl} onChange={e => setFormData({...formData, iconUrl: e.target.value})} /></div>
           <div className="space-y-2"><label className="text-sm font-medium">UI Priority (Sort Order)</label><input required type="number" className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm" value={formData.priority} onChange={e => setFormData({...formData, priority: parseInt(e.target.value) || 0})} /></div>
         </div>
-        <Button type="submit" disabled={!currentUsername || isSaving}>{isSaving ? "Saving..." : "Add Skill"}</Button>
+        <Button type="submit" disabled={!username || isSaving}>{isSaving ? "Saving..." : "Add Skill"}</Button>
       </form>
     </div>
   );
@@ -139,17 +162,25 @@ export function SkillsForm() {
 // EXPERIENCE FORM
 // ---------------------------------------------------------
 export function ExperienceForm() {
+  const { username } = useAdmin();
   const { data: experiences, isLoading, error, execute } = useApi(portfolioService.getExperience);
-  const [currentUsername, setCurrentUsername] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   const [formData, setFormData] = useState({
     role: "", companyName: "", companyUrl: "", location: "", category: "",
     technologies: "", startDate: "", endDate: "", description: "", imageUrl: ""
   });
 
+  useEffect(() => {
+    if (username) execute(username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username) return;
+    setSaveMessage(null);
     setIsSaving(true);
     try {
       const payload = {
@@ -159,22 +190,33 @@ export function ExperienceForm() {
         startDate: formData.startDate || null,
         endDate: formData.endDate || null // Allow ongoing jobs
       };
-      await portfolioService.saveExperience(currentUsername, payload);
-      execute(currentUsername);
+      await portfolioService.saveExperience(username, payload);
+      execute(username);
       setFormData({ role: "", companyName: "", companyUrl: "", location: "", category: "", technologies: "", startDate: "", endDate: "", description: "", imageUrl: "" });
-    } catch (err: any) { alert(err.message); } finally { setIsSaving(false); }
+      setSaveMessage({ type: 'success', text: "Experience added successfully!" });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (err: any) { 
+      setSaveMessage({ type: 'error', text: err.message });
+    } finally { setIsSaving(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure?")) return;
-    try { await portfolioService.deleteExperience(id); execute(currentUsername); } catch (err: any) { alert(err.message); }
+    try { await portfolioService.deleteExperience(id); execute(username); } catch (err: any) { setSaveMessage({ type: 'error', text: err.message }); }
   };
 
   return (
     <div className="border rounded-lg p-6 bg-card shadow-sm space-y-6">
-      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Manage Experience</h2>{isLoading && <span className="animate-pulse">Loading...</span>}</div>
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <h2 className="text-2xl font-bold tracking-tight">Manage Experience</h2>
+        {isLoading && <span className="text-sm text-muted-foreground animate-pulse">Loading data...</span>}
+      </div>
       {error && <div className="text-destructive text-sm font-bold">{error}</div>}
-      <LoadBar isLoading={isLoading} onLoad={(u) => { setCurrentUsername(u); execute(u); }} />
+      {saveMessage && (
+        <div className={`p-4 mb-6 rounded-md text-sm font-medium transition-all ${saveMessage.type === 'success' ? 'bg-green-100 text-green-900 dark:bg-green-900/30 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
+          {saveMessage.text}
+        </div>
+      )}
 
       {/* Existing Experience List */}
       {experiences && Array.isArray(experiences) && experiences.length > 0 && (
@@ -205,7 +247,7 @@ export function ExperienceForm() {
           <label className="text-sm font-medium">Description (Line separated bullets)</label>
           <textarea className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
         </div>
-        <Button type="submit" disabled={!currentUsername || isSaving}>{isSaving ? "Saving..." : "Add Experience"}</Button>
+        <Button type="submit" disabled={!username || isSaving}>{isSaving ? "Saving..." : "Add Experience"}</Button>
       </form>
     </div>
   );
@@ -215,36 +257,55 @@ export function ExperienceForm() {
 // ACHIEVEMENTS FORM
 // ---------------------------------------------------------
 export function AchievementsForm() {
+  const { username } = useAdmin();
   const { data: achievements, isLoading, error, execute } = useApi(portfolioService.getAchievements);
-  const [currentUsername, setCurrentUsername] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   const [formData, setFormData] = useState({ title: "", issuer: "", description: "", date: "", imageUrl: "", link: "" });
 
+  useEffect(() => {
+    if (username) execute(username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username) return;
+    setSaveMessage(null);
     setIsSaving(true);
     try {
       const payload = {
         ...formData,
         date: formData.date || null
       };
-      await portfolioService.saveAchievement(currentUsername, payload);
-      execute(currentUsername);
+      await portfolioService.saveAchievement(username, payload);
+      execute(username);
       setFormData({ title: "", issuer: "", description: "", date: "", imageUrl: "", link: "" });
-    } catch (err: any) { alert(err.message); } finally { setIsSaving(false); }
+      setSaveMessage({ type: 'success', text: "Achievement added successfully!" });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (err: any) { 
+      setSaveMessage({ type: 'error', text: err.message });
+    } finally { setIsSaving(false); }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure?")) return;
-    try { await portfolioService.deleteAchievement(id); execute(currentUsername); } catch (err: any) { alert(err.message); }
+    try { await portfolioService.deleteAchievement(id); execute(username); } catch (err: any) { setSaveMessage({ type: 'error', text: err.message }); }
   };
 
   return (
     <div className="border rounded-lg p-6 bg-card shadow-sm space-y-6">
-      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Manage Achievements</h2>{isLoading && <span className="animate-pulse">Loading...</span>}</div>
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <h2 className="text-2xl font-bold tracking-tight">Manage Achievements</h2>
+        {isLoading && <span className="text-sm text-muted-foreground animate-pulse">Loading data...</span>}
+      </div>
       {error && <div className="text-destructive text-sm font-bold">{error}</div>}
-      <LoadBar isLoading={isLoading} onLoad={(u) => { setCurrentUsername(u); execute(u); }} />
+      {saveMessage && (
+        <div className={`p-4 mb-6 rounded-md text-sm font-medium transition-all ${saveMessage.type === 'success' ? 'bg-green-100 text-green-900 dark:bg-green-900/30 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
+          {saveMessage.text}
+        </div>
+      )}
 
       {/* Existing Achievements List */}
       {achievements && Array.isArray(achievements) && achievements.length > 0 && (
@@ -272,7 +333,7 @@ export function AchievementsForm() {
           <label className="text-sm font-medium">Description</label>
           <textarea className="flex min-h-[80px] w-full rounded-md border border-input px-3 py-2 text-sm" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
         </div>
-        <Button type="submit" disabled={!currentUsername || isSaving}>{isSaving ? "Saving..." : "Add Achievement"}</Button>
+        <Button type="submit" disabled={!username || isSaving}>{isSaving ? "Saving..." : "Add Achievement"}</Button>
       </form>
     </div>
   );
@@ -282,11 +343,17 @@ export function AchievementsForm() {
 // CONTACT FORM
 // ---------------------------------------------------------
 export function ContactForm() {
+  const { username } = useAdmin();
   const { data, isLoading, error, execute } = useApi(portfolioService.getContact);
-  const [currentUsername, setCurrentUsername] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   const [formData, setFormData] = useState({ location: "", phone: "", email: "", linkedin: "", github: "", facebook: "", instagram: "" });
+
+  useEffect(() => {
+    if (username) execute(username);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username]);
 
   useEffect(() => {
     if (data) {
@@ -299,18 +366,30 @@ export function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username) return;
+    setSaveMessage(null);
     setIsSaving(true);
     try {
-      await portfolioService.saveContact(currentUsername, formData);
-      alert("Contact saved successfully!");
-    } catch (err: any) { alert(err.message); } finally { setIsSaving(false); }
+      await portfolioService.saveContact(username, formData);
+      setSaveMessage({ type: 'success', text: "Contact details saved successfully!" });
+      setTimeout(() => setSaveMessage(null), 3000);
+    } catch (err: any) { 
+      setSaveMessage({ type: 'error', text: err.message });
+    } finally { setIsSaving(false); }
   };
 
   return (
     <div className="border rounded-lg p-6 bg-card shadow-sm space-y-6">
-      <div className="flex items-center justify-between"><h2 className="text-2xl font-bold">Contact & Socials</h2>{isLoading && <span className="animate-pulse">Loading...</span>}</div>
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <h2 className="text-2xl font-bold tracking-tight">Contact & Socials</h2>
+        {isLoading && <span className="text-sm text-muted-foreground animate-pulse">Loading data...</span>}
+      </div>
       {error && <div className="text-destructive text-sm font-bold">{error}</div>}
-      <LoadBar isLoading={isLoading} onLoad={(u) => { setCurrentUsername(u); execute(u); }} />
+      {saveMessage && (
+        <div className={`p-4 mb-6 rounded-md text-sm font-medium transition-all ${saveMessage.type === 'success' ? 'bg-green-100 text-green-900 dark:bg-green-900/30 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
+          {saveMessage.text}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
@@ -322,7 +401,7 @@ export function ContactForm() {
           <div className="space-y-2"><label className="text-sm font-medium">Facebook URL</label><input type="url" className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm" value={formData.facebook} onChange={e => setFormData({...formData, facebook: e.target.value})} /></div>
           <div className="space-y-2"><label className="text-sm font-medium">Instagram URL</label><input type="url" className="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm" value={formData.instagram} onChange={e => setFormData({...formData, instagram: e.target.value})} /></div>
         </div>
-        <Button type="submit" disabled={!currentUsername || isSaving}>{isSaving ? "Saving..." : "Save Contact"}</Button>
+        <Button type="submit" disabled={!username || isSaving}>{isSaving ? "Saving..." : "Save Contact"}</Button>
       </form>
     </div>
   );

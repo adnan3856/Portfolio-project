@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { portfolioService } from "@/services/portfolioService";
 import { useApi } from "@/hooks/useApi";
+import { useAdmin } from "@/components/admin/AdminContext";
 
 export function ProfileForm() {
+  const { username, setUsername } = useAdmin();
   const { data, isLoading, error, execute } = useApi(portfolioService.getProfile);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-  const [searchUsername, setSearchUsername] = useState("");
+  const [searchUsername, setSearchUsername] = useState(username || "");
 
   const [formData, setFormData] = useState({
     username: "",
@@ -20,6 +22,14 @@ export function ProfileForm() {
     linkedinUrl: "",
     portfolioUrl: ""
   });
+
+  // Keep local search synchronized with global username
+  useEffect(() => {
+    setSearchUsername(username);
+    if (username) {
+      execute(username);
+    }
+  }, [username]);
 
   useEffect(() => {
     if (data) {
@@ -44,7 +54,9 @@ export function ProfileForm() {
   const handleLoad = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchUsername.trim()) {
-      execute(searchUsername.trim());
+      const trimmed = searchUsername.trim();
+      setUsername(trimmed);
+      execute(trimmed); // Force fetch even if username hasn't changed
     }
   };
 
@@ -61,6 +73,7 @@ export function ProfileForm() {
         // Create new
         await portfolioService.createProfile(formData);
         setSaveMessage({ type: 'success', text: 'Profile created successfully!' });
+        setUsername(formData.username); // Globally store the new username
       }
     } catch (err: any) {
       setSaveMessage({ type: 'error', text: err.message || 'Failed to save profile' });

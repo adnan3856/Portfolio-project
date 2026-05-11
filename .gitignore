@@ -38,3 +38,5 @@ Thumbs.db
 # Ignore Java build artifacts 
 target/
 *.class
+New Portfolio/UI/my-portfolio-app/package-lock.json
+New Portfolio/UI/my-portfolio-app/package-lock.json
