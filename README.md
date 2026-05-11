@@ -119,3 +119,15 @@ The project follows a standard Spring Boot layered architecture, with specific p
 * **Vite Proxy & CORS Configuration**: Configured a local development proxy within `vite.config.ts` to cleanly route `/api` requests to the Spring Boot backend (`127.0.0.1:8082`). This bypassed strict browser CORS policies and fixed local connection drops.
 * **Robust Service Layer**: Expanded the Axios `apiClient` and `portfolioService` to handle full CRUD operations. Introduced targeted error catching to easily distinguish between frontend network failures and backend validations.
 * **Data Serialization Enhancements**: Handled data mismatch edge cases between React and Spring Boot, such as intercepting empty date strings (`""`) in forms and converting them to `null` to prevent `LocalDate` parsing crashes in Java.
+
+### [Update 10] - Cinematic UI/UX Refactor & Design System Standardization
+*Marker: Added to track incremental refactoring improvements across different days.*
+
+* **Unified Design System**: Standardized the visual language across the entire application, enforcing a premium dark-slate theme with cohesive glassmorphism components (`bg-white/5`, `backdrop-blur`, `rounded-2xl`) and strict cyan/blue accents.
+* **Animation Polish**: Stripped away visually heavy, jittery animations in favor of smooth, cinematic Framer Motion transitions (gentle fades, opacity shifts, and subtle y-axis lifts) to dramatically reduce visual noise.
+* **Dynamic Scroll-Linked Navbar**: Re-engineered the navbar to sit flush with the Hero section seamlessly, introducing an intersection-based animation that elegantly slides in the user's branding only after the Hero leaves the viewport.
+* **Structural Component Enhancements**:
+  * **Hero**: Refined Call-to-Action hierarchy (solid primary vs. glass secondary) and fixed layered z-index issues for smooth auto-scrolling.
+  * **Experience**: Upgraded the grid to a sleek vertical timeline with glowing indicators.
+  * **Achievements**: Transformed oversized cards into a compact, professional accordion list to preserve the visual dominance of the Experience section.
+  * **Contact**: Rebuilt into a modern split-pane layout featuring interactive click-to-copy fields.
