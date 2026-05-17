@@ -40,6 +40,19 @@ export const portfolioService = {
     return apiClient.delete(`/experience/${id}`).then((res) => res.data);
   },
   
+  getProjects: async (username: string) => {
+    return apiClient.get(`/projects/${username}`).then((res) => res.data);
+  },
+  saveProject: async (username: string, data: any) => {
+    return apiClient.post(`/projects/save/${username}`, data).then((res) => res.data);
+  },
+  updateProject: async (username: string, projectId: string, data: any) => {
+    return apiClient.put(`/projects/update/${username}/${projectId}`, data).then((res) => res.data);
+  },
+  deleteProject: async (username: string, projectId: string) => {
+    return apiClient.delete(`/projects/${username}/${projectId}`).then((res) => res.data);
+  },
+
   getAchievements: async (username: string) => {
     return apiClient.get(`/achievements/${username}`).then((res) => res.data);
   },

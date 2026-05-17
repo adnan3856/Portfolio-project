@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { SkillsSection } from "@/components/sections/SkillsSection";
 import { ExperienceSection } from "@/components/sections/ExperienceSection";
+import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { AchievementsSection } from "@/components/sections/AchievementsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 
@@ -15,6 +16,7 @@ export function Home() {
     about: any;
     skills: any[];
     experience: any[];
+    projects: any[];
     achievements: any[];
     contact: any;
   } | null>(null);
@@ -31,10 +33,11 @@ export function Home() {
     const fetchAllData = async () => {
       setIsLoading(true);
       try {
-        const [aboutRes, skillsRes, expRes, achRes, contactRes] = await Promise.allSettled([
+        const [aboutRes, skillsRes, expRes, projRes, achRes, contactRes] = await Promise.allSettled([
           portfolioService.getAbout(username),
           portfolioService.getSkills(username),
           portfolioService.getExperience(username),
+          portfolioService.getProjects(username),
           portfolioService.getAchievements(username),
           portfolioService.getContact(username)
         ]);
@@ -43,6 +46,7 @@ export function Home() {
           about: aboutRes.status === 'fulfilled' && aboutRes.value ? aboutRes.value : null,
           skills: skillsRes.status === 'fulfilled' && Array.isArray(skillsRes.value) ? skillsRes.value : [],
           experience: expRes.status === 'fulfilled' && Array.isArray(expRes.value) ? expRes.value : [],
+          projects: projRes.status === 'fulfilled' && Array.isArray(projRes.value) ? projRes.value : [],
           achievements: achRes.status === 'fulfilled' && Array.isArray(achRes.value) ? achRes.value : [],
           contact: contactRes.status === 'fulfilled' && contactRes.value ? {
             email: contactRes.value.email,
@@ -108,6 +112,13 @@ export function Home() {
             <>
               <div className="h-px w-full max-w-xs mx-auto bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
               <ExperienceSection experiences={data.experience} />
+            </>
+          )}
+
+          {data.projects && data.projects.length > 0 && (
+            <>
+              <div className="h-px w-full max-w-xs mx-auto bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+              <ProjectsSection projects={data.projects} />
             </>
           )}
 
