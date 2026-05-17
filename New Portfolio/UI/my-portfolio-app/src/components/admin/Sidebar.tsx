@@ -8,7 +8,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const { username } = useAdmin();
-  const tabs = ["Profile", "About", "Skills", "Experience", "Achievements", "Contact"];
+  const tabs = ["Profile", "About", "Skills", "Experience", "Projects", "Achievements", "Contact"];
   
   return (
     <aside className="w-64 border-r bg-card min-h-[calc(100vh-64px)] hidden md:block p-4">

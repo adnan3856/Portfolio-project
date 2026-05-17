@@ -3,6 +3,7 @@ import { Navbar } from "@/Navbar";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { ProfileForm } from "@/components/admin/ProfileForm";
 import { AboutForm, SkillsForm, ExperienceForm, AchievementsForm, ContactForm } from "@/components/admin/FormTemplates";
+import { ProjectsForm } from "@/components/admin/ProjectsForm";
 import { AdminProvider } from "@/components/admin/AdminContext";
 
 export function Admin() {
@@ -14,6 +15,7 @@ export function Admin() {
       case "About": return <AboutForm />;
       case "Skills": return <SkillsForm />;
       case "Experience": return <ExperienceForm />;
+      case "Projects": return <ProjectsForm />;
       case "Achievements": return <AchievementsForm />;
       case "Contact": return <ContactForm />;
       default: return <ProfileForm />;
